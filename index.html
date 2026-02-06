@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PONTUAÇÃO LAST STAND | Sistema de Campeonato</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary: #A78BFA;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --dark: #111827;
+            --darker: #000000;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+            --card-bg: #1F2937;
+            --card-border: #374151;
+            --nav-active: rgba(139, 92, 246, 0.2);
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--darker);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Header */
+        .mobile-header {
+            background: var(--dark);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .theme-toggle, .refresh-btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--light);
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover, .refresh-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .mobile-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .mobile-header .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .mobile-header .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .menu-toggle {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--light);
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .menu-toggle:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        /* Navegação Mobile */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: var(--dark);
+            z-index: 1000;
+            transition: var(--transition);
+            overflow-y: auto;
+            padding: 20px 0;
+            border-right: 2px solid var(--primary);
+        }
+        
+        .mobile-nav.active {
+            left: 0;
+        }
+        
+        .mobile-nav-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .mobile-nav-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--light);
+        }
+        
+        .close-nav {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-list {
+            list-style: none;
+        }
+        
+        .mobile-nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .mobile-nav-link.active {
+            background: var(--nav-active);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+        
+        .mobile-nav-link i {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .status-cards-mobile {
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .status-card-mobile {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+        
+        .status-card-mobile:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .status-label-mobile {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .status-value-mobile {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Abas Mobile */
+        .tabs-container-mobile {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px 20px;
+            gap: 10px;
+            background: var(--dark);
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 71px;
+            z-index: 99;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .tabs-container-mobile::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab-btn-mobile {
+            flex-shrink: 0;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn-mobile.active {
+            background: var(--nav-active);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Conteúdo Principal */
+        .app-main-mobile {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .card-mobile {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+        
+        .card-mobile:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        
+        .card-header-mobile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .card-title-mobile {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Formulários */
+        .form-group-mobile {
+            margin-bottom: 20px;
+        }
+        
+        .form-label-mobile {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-input-mobile, .form-select-mobile {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+        }
+        
+        .form-input-mobile:focus, .form-select-mobile:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        /* Botões */
+        .btn-mobile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-bottom: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .btn-primary-mobile {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-success-mobile {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+        
+        .btn-success-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-danger-mobile {
+            background: linear-gradient(135deg, var(--danger), #DC2626);
+            color: white;
+        }
+        
+        .btn-danger-mobile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-secondary-mobile {
+            background: var(--card-bg);
+            color: var(--light);
+            border: 1px solid var(--card-border);
+        }
+        
+        .btn-secondary-mobile:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        /* Dropdown Windows 11 Style */
+        .windows-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-toggle {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .dropdown-toggle:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+        }
+        
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+        
+        .dropdown-toggle.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-top: 4px;
+            padding: 8px;
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            border-radius: 6px;
+            color: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .dropdown-item.selected {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--primary);
+        }
+        
+        .dropdown-item.occupied {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .placement-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .pos-1 { background: #FFD700; color: #000; }
+        .pos-2 { background: #C0C0C0; color: #000; }
+        .pos-3 { background: #CD7F32; color: #000; }
+        .pos-4-6 { background: rgba(139, 92, 246, 0.3); color: var(--primary); }
+        .pos-7-9 { background: rgba(107, 114, 128, 0.3); color: var(--gray); }
+        .pos-10-12 { background: rgba(239, 68, 68, 0.3); color: var(--danger); }
+        
+        /* Sistema de Quedas */
+        .falls-system-mobile {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .falls-display-mobile {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 2px solid var(--card-border);
+            margin-bottom: 20px;
+        }
+        
+        .falls-number-mobile {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .falls-controls-mobile {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .falls-btn-mobile {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--light);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .falls-btn-mobile:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        /* Tabela de Classificação */
+        .table-wrapper-mobile {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            margin-top: 15px;
+        }
+        
+        .ranking-table-mobile {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        
+        .ranking-table-mobile thead {
+            background: var(--dark);
+        }
+        
+        .ranking-table-mobile th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--light);
+            font-size: 13px;
+            border-bottom: 2px solid var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .ranking-table-mobile td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .position-badge-mobile {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .pos-1-mobile { background: #FFD700; color: #000; }
+        .pos-2-mobile { background: #C0C0C0; color: #000; }
+        .pos-3-mobile { background: #CD7F32; color: #000; }
+        
+        /* Histórico */
+        .history-list-mobile {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history-item-mobile {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+        
+        .history-item-mobile:hover {
+            transform: translateX(5px);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Notificações */
+        .notification-container-mobile {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification-mobile {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            color: var(--light);
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.3s ease;
+            max-width: 300px;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .notification-success-mobile {
+            border-left: 4px solid var(--success);
+        }
+        
+        .notification-error-mobile {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .notification-warning-mobile {
+            border-left: 4px solid var(--warning);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--dark);
+            border-top: 2px solid var(--primary);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 99;
+        }
+        
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 10px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: var(--transition);
+            min-width: 60px;
+        }
+        
+        .bottom-nav-btn.active {
+            color: var(--primary);
+            background: var(--nav-active);
+        }
+        
+        .bottom-nav-btn i {
+            font-size: 20px;
+        }
+        
+        /* Responsividade */
+        @media (min-width: 768px) {
+            .tabs-container-mobile {
+                top: 71px;
+            }
+            
+            .btn-mobile {
+                width: auto;
+                margin-bottom: 0;
+            }
+            
+            .windows-dropdown {
+                max-width: 300px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .app-container {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            
+            .mobile-header, .tabs-container-mobile, .bottom-nav {
+                display: none;
+            }
+            
+            .mobile-nav {
+                position: relative;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                border-right: 2px solid var(--primary);
+            }
+            
+            .mobile-nav-header, .close-nav {
+                display: none;
+            }
+            
+            .app-main-mobile {
+                padding: 30px;
+                padding-bottom: 30px;
+                height: calc(100vh - 40px);
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Mobile -->
+        <header class="mobile-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-skull-crossbones"></i>
+                </div>
+                <div class="logo-text">LAST STAND</div>
+            </div>
+            <div class="header-actions">
+                <button class="refresh-btn" id="refreshBtn" aria-label="Recarregar dados">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Navegação Mobile -->
+        <nav class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-header">
+                <div class="mobile-nav-title">LAST STAND</div>
+                <button class="close-nav" id="closeNav" aria-label="Fechar menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <ul class="mobile-nav-list" id="mobileNavList">
+                <!-- Itens serão adicionados via JavaScript -->
+            </ul>
+            
+            <div class="status-cards-mobile">
+                <div class="status-card-mobile">
+                    <div class="status-label-mobile">EQUIPES</div>
+                    <div class="status-value-mobile" id="total-teams">0</div>
+                </div>
+                <div class="status-card-mobile">
+                    <div class="status-label-mobile">PARTIDAS</div>
+                    <div class="status-value-mobile" id="total-matches">0</div>
+                </div>
+                <div class="status-card-mobile">
+                    <div class="status-label-mobile">ATIVO</div>
+                    <div class="status-value-mobile" id="active-match">-</div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+        
+        <!-- Abas Mobile -->
+        <div class="tabs-container-mobile" id="mobileTabs">
+            <!-- Abas serão adicionadas via JavaScript -->
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <main class="app-main-mobile" id="appMain">
+            <!-- Conteúdo será carregado via JavaScript -->
+        </main>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" id="bottomNav">
+            <!-- Itens serão adicionados via JavaScript -->
+        </nav>
+        
+        <!-- Notificações -->
+        <div class="notification-container-mobile" id="notificationContainer"></div>
+    </div>
+    
+    <script>
+        // Sistema de dados
+        let scoreSettings = {
+            killPoints: 1,
+            booyahPoints: 3,
+            placementPoints: {
+                1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 
+                6: 5, 7: 4, 8: 3, 9: 2, 
+                10: 1, 11: 1, 12: 1
+            },
+            placementPreset: 'lbff'
+        };
+        
+        let teams = [];
+        let currentMatch = {
+            id: null,
+            teamsInMatch: [],
+            placementsUsed: [],
+            isActive: false
+        };
+        let matchHistory = [];
+        let currentFalls = 0;
+        
+        // Configurações das abas
+        const tabsConfig = [
+            { id: 'equipes', title: 'Equipes', icon: 'users', subtitle: 'Gerenciar equipes' },
+            { id: 'partida', title: 'Partida', icon: 'gamepad', subtitle: 'Controle de partidas' },
+            { id: 'classificacao', title: 'Classificação', icon: 'trophy', subtitle: 'Ranking atual' },
+            { id: 'historico', title: 'Histórico', icon: 'history', subtitle: 'Partidas anteriores' },
+            { id: 'configuracoes', title: 'Configurações', icon: 'cog', subtitle: 'Ajustes do sistema' }
+        ];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMobileNavigation();
+            loadAllData();
+            initializeEventListeners();
+            
+            if (teams.length === 0) {
+                setTimeout(() => {
+                    showNotification('Bem-vindo ao PONTUAÇÃO LAST STAND!', 'success');
+                }, 1000);
+            }
+        });
+        
+        // Inicializar navegação mobile
+        function initializeMobileNavigation() {
+            const mobileNavList = document.getElementById('mobileNavList');
+            const mobileTabs = document.getElementById('mobileTabs');
+            const bottomNav = document.getElementById('bottomNav');
+            
+            mobileNavList.innerHTML = '';
+            mobileTabs.innerHTML = '';
+            bottomNav.innerHTML = '';
+            
+            tabsConfig.forEach((tab, index) => {
+                // Menu lateral
+                const navItem = document.createElement('li');
+                navItem.className = 'mobile-nav-item';
+                navItem.innerHTML = `
+                    <a href="#" class="mobile-nav-link ${index === 0 ? 'active' : ''}" data-tab="${tab.id}">
+                        <i class="fas fa-${tab.icon}"></i>
+                        <span>${tab.title}</span>
+                    </a>
+                `;
+                mobileNavList.appendChild(navItem);
+                
+                // Abas superiores
+                const tabBtn = document.createElement('button');
+                tabBtn.className = `tab-btn-mobile ${index === 0 ? 'active' : ''}`;
+                tabBtn.dataset.tab = tab.id;
+                tabBtn.innerHTML = `
+                    <i class="fas fa-${tab.icon}"></i>
+                    <span>${tab.title}</span>
+                `;
+                mobileTabs.appendChild(tabBtn);
+                
+                // Bottom navigation
+                const bottomBtn = document.createElement('button');
+                bottomBtn.className = `bottom-nav-btn ${index === 0 ? 'active' : ''}`;
+                bottomBtn.dataset.tab = tab.id;
+                bottomBtn.innerHTML = `
+                    <i class="fas fa-${tab.icon}"></i>
+                    <span>${tab.title}</span>
+                `;
+                bottomNav.appendChild(bottomBtn);
+            });
+            
+            // Event listeners para navegação
+            document.querySelectorAll('.mobile-nav-link, .tab-btn-mobile, .bottom-nav-btn').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.dataset.tab;
+                    switchTab(tabId);
+                    
+                    if (window.innerWidth < 1024) {
+                        document.getElementById('mobileNav').classList.remove('active');
+                        document.getElementById('overlay').classList.remove('active');
+                    }
+                });
+            });
+            
+            // Inicializar primeira aba
+            switchTab('equipes');
+        }
+        
+        // Trocar de aba
+        function switchTab(tabId) {
+            // Atualizar classes ativas
+            document.querySelectorAll('.mobile-nav-link, .tab-btn-mobile, .bottom-nav-btn').forEach(element => {
+                element.classList.remove('active');
+                if (element.dataset.tab === tabId) {
+                    element.classList.add('active');
+                }
+            });
+            
+            // Atualizar conteúdo
+            const appMain = document.getElementById('appMain');
+            appMain.innerHTML = generateTabContent(tabId);
+            
+            // Inicializar componentes específicos
+            initializeTabComponents(tabId);
+            
+            // Atualizar status
+            updateStatusCards();
+        }
+        
+        // Gerar conteúdo da aba
+        function generateTabContent(tabId) {
+            switch(tabId) {
+                case 'equipes':
+                    return generateEquipesTab();
+                case 'partida':
+                    return generatePartidaTab();
+                case 'classificacao':
+                    return generateClassificacaoTab();
+                case 'historico':
+                    return generateHistoricoTab();
+                case 'configuracoes':
+                    return generateConfiguracoesTab();
+                default:
+                    return '<div class="card-mobile"><p>Conteúdo não disponível</p></div>';
+            }
+        }
+        
+        // Inicializar componentes da aba
+        function initializeTabComponents(tabId) {
+            switch(tabId) {
+                case 'equipes':
+                    updateTeamsList();
+                    break;
+                case 'partida':
+                    updateTeamSelect();
+                    updateCurrentMatchDisplay();
+                    initializePlacementDropdown();
+                    break;
+                case 'classificacao':
+                    updateRanking();
+                    break;
+                case 'historico':
+                    updateMatchHistory();
+                    break;
+                case 'configuracoes':
+                    updateSettingsUI();
+                    break;
+            }
+        }
+        
+        // Carregar dados
+        function loadAllData() {
+            // Carregar configurações
+            const savedSettings = localStorage.getItem('lsScoreSettings');
+            if (savedSettings) {
+                scoreSettings = JSON.parse(savedSettings);
+            }
+            
+            // Carregar equipes
+            const savedTeams = localStorage.getItem('lsTeams');
+            if (savedTeams) {
+                teams = JSON.parse(savedTeams);
+            }
+            
+            // Carregar histórico
+            const savedMatches = localStorage.getItem('lsMatchHistory');
+            if (savedMatches) {
+                matchHistory = JSON.parse(savedMatches);
+            }
+            
+            // Carregar partida atual
+            const savedCurrentMatch = localStorage.getItem('lsCurrentMatch');
+            if (savedCurrentMatch) {
+                currentMatch = JSON.parse(savedCurrentMatch);
+            }
+            
+            updateStatusCards();
+        }
+        
+        // Inicializar event listeners
+        function initializeEventListeners() {
+            // Menu mobile
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                document.getElementById('mobileNav').classList.add('active');
+                document.getElementById('overlay').classList.add('active');
+            });
+            
+            document.getElementById('closeNav').addEventListener('click', function() {
+                document.getElementById('mobileNav').classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+            });
+            
+            document.getElementById('overlay').addEventListener('click', function() {
+                document.getElementById('mobileNav').classList.remove('active');
+                this.classList.remove('active');
+            });
+            
+            // Botão de refresh
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                loadAllData();
+                const currentTab = document.querySelector('.tab-btn-mobile.active').dataset.tab;
+                switchTab(currentTab);
+                showNotification('Dados atualizados!', 'success');
+            });
+            
+            // Event listeners globais
+            document.addEventListener('click', function(e) {
+                // Adicionar equipe
+                if (e.target.id === 'add-team' || e.target.closest('#add-team')) {
+                    addTeam();
+                }
+                
+                // Importar exemplo
+                if (e.target.id === 'import-example' || e.target.closest('#import-example')) {
+                    addExampleTeams();
+                }
+                
+                // Limpar equipes
+                if (e.target.id === 'clear-teams' || e.target.closest('#clear-teams')) {
+                    clearTeams();
+                }
+                
+                // Nova partida
+                if (e.target.id === 'new-match' || e.target.closest('#new-match')) {
+                    startNewMatch();
+                }
+                
+                // Finalizar partida
+                if (e.target.id === 'finish-match' || e.target.closest('#finish-match')) {
+                    finishMatch();
+                }
+                
+                // Registrar na partida
+                if (e.target.id === 'register-match' || e.target.closest('#register-match')) {
+                    registerTeamInMatch();
+                }
+                
+                // Controles de quedas
+                if (e.target.id === 'increase-fall' || e.target.closest('#increase-fall')) {
+                    if (currentFalls < 10) {
+                        currentFalls++;
+                        document.getElementById('falls-count-mobile').textContent = currentFalls;
+                        document.getElementById('falls-slider').value = currentFalls;
+                    }
+                }
+                
+                if (e.target.id === 'decrease-fall' || e.target.closest('#decrease-fall')) {
+                    if (currentFalls > 0) {
+                        currentFalls--;
+                        document.getElementById('falls-count-mobile').textContent = currentFalls;
+                        document.getElementById('falls-slider').value = currentFalls;
+                    }
+                }
+                
+                // Slider de quedas
+                if (e.target.id === 'falls-slider') {
+                    currentFalls = parseInt(e.target.value);
+                    document.getElementById('falls-count-mobile').textContent = currentFalls;
+                }
+                
+                // Salvar configurações
+                if (e.target.id === 'save-settings' || e.target.closest('#save-settings')) {
+                    saveSettings();
+                }
+                
+                // Exportar dados
+                if (e.target.id === 'export-json' || e.target.closest('#export-json')) {
+                    exportJSON();
+                }
+                
+                if (e.target.id === 'export-csv' || e.target.closest('#export-csv')) {
+                    exportCSV();
+                }
+                
+                // Limpar histórico
+                if (e.target.id === 'clear-history' || e.target.closest('#clear-history')) {
+                    clearHistory();
+                }
+                
+                // Reiniciar campeonato
+                if (e.target.id === 'reset-all' || e.target.closest('#reset-all')) {
+                    resetChampionship();
+                }
+            });
+            
+            // Responsividade
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1024) {
+                    document.getElementById('mobileNav').classList.remove('active');
+                    document.getElementById('overlay').classList.remove('active');
+                }
+            });
+        }
+        
+        // Atualizar status cards
+        function updateStatusCards() {
+            document.getElementById('total-teams').textContent = teams.length;
+            document.getElementById('total-matches').textContent = matchHistory.length;
+            document.getElementById('active-match').textContent = currentMatch.isActive ? `#${currentMatch.id}` : '-';
+        }
+        
+        // GERAR CONTEÚDO DAS ABAS
+        
+        // Aba: Equipes
+        function generateEquipesTab() {
+            return `
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-plus-circle"></i> NOVA EQUIPE</h3>
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Nome da Equipe</label>
+                        <input type="text" class="form-input-mobile" id="team-name" placeholder="Ex: Furia">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Tag (2-4 letras)</label>
+                        <input type="text" class="form-input-mobile" id="team-abbr" placeholder="Ex: FUR" maxlength="4">
+                    </div>
+                    
+                    <button class="btn-mobile btn-primary-mobile" id="add-team">
+                        <i class="fas fa-plus"></i> ADICIONAR
+                    </button>
+                    
+                    <button class="btn-mobile btn-secondary-mobile" id="import-example">
+                        <i class="fas fa-users"></i> EQUIPES EXEMPLO
+                    </button>
+                </div>
+                
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-users"></i> EQUIPES (${teams.length})</h3>
+                    </div>
+                    
+                    <div id="teams-list-mobile">
+                        <!-- Lista de equipes será carregada aqui -->
+                    </div>
+                    
+                    ${teams.length > 0 ? `
+                    <button class="btn-mobile btn-danger-mobile" id="clear-teams">
+                        <i class="fas fa-trash"></i> LIMPAR TODAS
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Aba: Partida
+        function generatePartidaTab() {
+            return `
+                ${currentMatch.isActive ? `
+                <div class="card-mobile" style="border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-fire"></i> PARTIDA ATIVA</h3>
+                        <span style="color: var(--primary); font-weight: 700; font-family: 'Orbitron';">#${currentMatch.id}</span>
+                    </div>
+                    
+                    <div id="current-match-teams-mobile">
+                        <!-- Equipes da partida serão carregadas aqui -->
+                    </div>
+                    
+                    <button class="btn-mobile btn-success-mobile" id="finish-match">
+                        <i class="fas fa-flag-checkered"></i> FINALIZAR PARTIDA
+                    </button>
+                </div>
+                ` : ''}
+                
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-gamepad"></i> CONTROLE DE PARTIDA</h3>
+                    </div>
+                    
+                    ${!currentMatch.isActive ? `
+                    <button class="btn-mobile btn-primary-mobile" id="new-match">
+                        <i class="fas fa-play"></i> INICIAR NOVA PARTIDA
+                    </button>
+                    ` : ''}
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">SELECIONAR EQUIPE</label>
+                        <select class="form-select-mobile" id="select-team" ${currentMatch.isActive ? '' : 'disabled'}>
+                            <option value="">Escolha uma equipe</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div class="form-group-mobile">
+                            <label class="form-label-mobile">ELIMINAÇÕES</label>
+                            <input type="number" class="form-input-mobile" id="kills" value="0" min="0" ${currentMatch.isActive ? '' : 'disabled'}>
+                        </div>
+                        <div class="form-group-mobile">
+                            <label class="form-label-mobile">VITÓRIA</label>
+                            <select class="form-select-mobile" id="booyahs" ${currentMatch.isActive ? '' : 'disabled'}>
+                                <option value="0">NÃO</option>
+                                <option value="1">SIM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">COLOCAÇÃO FINAL</label>
+                        <div id="placement-dropdown-container">
+                            <!-- Dropdown será inserido aqui -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">QUEDAS</label>
+                        <div class="falls-system-mobile">
+                            <div class="falls-display-mobile">
+                                <div class="falls-number-mobile" id="falls-count-mobile">0</div>
+                                <div style="color: var(--gray); font-size: 14px;">QUEDAS REGISTRADAS</div>
+                            </div>
+                            <div class="falls-controls-mobile">
+                                <button class="falls-btn-mobile" id="decrease-fall" ${currentMatch.isActive ? '' : 'disabled'}>
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="falls-btn-mobile" id="increase-fall" ${currentMatch.isActive ? '' : 'disabled'}>
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <input type="range" id="falls-slider" min="0" max="10" value="0" ${currentMatch.isActive ? '' : 'disabled'} 
+                                   style="width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--primary), var(--secondary)); margin-top: 20px;">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-mobile btn-primary-mobile" id="register-match" ${currentMatch.isActive ? '' : 'disabled'}>
+                        <i class="fas fa-save"></i> REGISTRAR NA PARTIDA
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Aba: Classificação
+        function generateClassificacaoTab() {
+            return `
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-trophy"></i> CLASSIFICAÇÃO</h3>
+                        <button class="btn-mobile btn-secondary-mobile" id="export-ranking" style="padding: 8px 15px; font-size: 14px;">
+                            <i class="fas fa-download"></i> EXPORTAR
+                        </button>
+                    </div>
+                    
+                    <div class="table-wrapper-mobile">
+                        <table class="ranking-table-mobile">
+                            <thead>
+                                <tr>
+                                    <th>POS</th>
+                                    <th>EQUIPE</th>
+                                    <th>PTS</th>
+                                    <th>E</th>
+                                    <th>V</th>
+                                    <th>Q</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ranking-body-mobile">
+                                <!-- Ranking será carregado aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Aba: Histórico
+        function generateHistoricoTab() {
+            return `
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-history"></i> HISTÓRICO</h3>
+                        ${matchHistory.length > 0 ? `
+                        <button class="btn-mobile btn-danger-mobile" id="clear-history" style="padding: 8px 15px; font-size: 14px;">
+                            <i class="fas fa-trash"></i> LIMPAR
+                        </button>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="history-list-mobile" id="match-history-mobile">
+                        <!-- Histórico será carregado aqui -->
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Aba: Configurações
+        function generateConfiguracoesTab() {
+            return `
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-sliders-h"></i> SISTEMA DE PONTUAÇÃO</h3>
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Pontos por Eliminação</label>
+                        <input type="number" class="form-input-mobile" id="kill-points" value="${scoreSettings.killPoints}" min="0" step="0.5">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Pontos por Vitória</label>
+                        <input type="number" class="form-input-mobile" id="booyah-points" value="${scoreSettings.booyahPoints}" min="0" step="0.5">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Sistema de Colocação</label>
+                        <select class="form-select-mobile" id="placement-preset">
+                            <option value="lbff" ${scoreSettings.placementPreset === 'lbff' ? 'selected' : ''}>LBFF 2021</option>
+                            <option value="simple" ${scoreSettings.placementPreset === 'simple' ? 'selected' : ''}>Sistema Simples</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-mobile btn-primary-mobile" id="save-settings">
+                        <i class="fas fa-save"></i> SALVAR CONFIGURAÇÕES
+                    </button>
+                </div>
+                
+                <div class="card-mobile">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile"><i class="fas fa-download"></i> EXPORTAR DADOS</h3>
+                    </div>
+                    
+                    <button class="btn-mobile btn-secondary-mobile" id="export-json">
+                        <i class="fas fa-file-code"></i> EXPORTAR JSON
+                    </button>
+                    
+                    <button class="btn-mobile btn-secondary-mobile" id="export-csv">
+                        <i class="fas fa-file-csv"></i> EXPORTAR CSV
+                    </button>
+                </div>
+                
+                <div class="card-mobile" style="border: 2px solid var(--danger);">
+                    <div class="card-header-mobile">
+                        <h3 class="card-title-mobile" style="color: var(--danger);">
+                            <i class="fas fa-exclamation-triangle"></i> ÁREA DE RISCO
+                        </h3>
+                    </div>
+                    
+                    <p style="color: var(--gray); margin-bottom: 20px; font-size: 14px;">
+                        Todas as equipes, partidas e configurações serão perdidas permanentemente.
+                    </p>
+                    
+                    <button class="btn-mobile btn-danger-mobile" id="reset-all">
+                        <i class="fas fa-bomb"></i> REINICIAR SISTEMA
+                    </button>
+                </div>
+            `;
+        }
+        
+        // FUNÇÕES DE ATUALIZAÇÃO
+        
+        // Atualizar lista de equipes
+        function updateTeamsList() {
+            const container = document.getElementById('teams-list-mobile');
+            if (!container) return;
+            
+            if (teams.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--gray);">
+                        <i class="fas fa-users" style="font-size: 40px; opacity: 0.3; margin-bottom: 15px;"></i>
+                        <p>Nenhuma equipe cadastrada</p>
+                        <p style="font-size: 12px; margin-top: 5px;">Adicione equipes para começar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            teams.forEach(team => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; 
+                                padding: 12px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 10px;
+                                border: 1px solid var(--card-border); transition: var(--transition);">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-weight: 700; color: var(--primary); font-size: 16px;">${team.abbreviation}</div>
+                                <div style="font-size: 12px; background: rgba(139, 92, 246, 0.1); color: var(--primary); 
+                                     padding: 2px 8px; border-radius: 10px;">${team.points} pts</div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--gray); margin-top: 3px;">${team.name}</div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-mobile" style="padding: 6px 12px; font-size: 12px; background: rgba(139, 92, 246, 0.1);" 
+                                    onclick="editTeamPrompt(${team.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-mobile btn-danger-mobile" style="padding: 6px 12px; font-size: 12px;" 
+                                    onclick="deleteTeam(${team.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Inicializar dropdown de colocação
+        function initializePlacementDropdown() {
+            const container = document.getElementById('placement-dropdown-container');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="windows-dropdown">
+                    <button type="button" class="dropdown-toggle" id="placement-dropdown-toggle">
+                        <span id="dropdown-selected-text">Selecione a colocação</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                    <div class="dropdown-menu" id="placement-dropdown-menu">
+                        ${generatePlacementOptions()}
+                    </div>
+                </div>
+                <input type="hidden" id="placement" value="">
+            `;
+            
+            // Configurar eventos
+            const toggle = document.getElementById('placement-dropdown-toggle');
+            const menu = document.getElementById('placement-dropdown-menu');
+            const selectedText = document.getElementById('dropdown-selected-text');
+            const hiddenInput = document.getElementById('placement');
+            
+            if (!toggle || !menu) return;
+            
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('active');
+                menu.classList.toggle('show');
+            });
+            
+            // Fechar ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                    toggle.classList.remove('active');
+                    menu.classList.remove('show');
+                }
+            });
+            
+            menu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Selecionar item
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('occupied')) return;
+                    
+                    const value = this.dataset.value;
+                    const text = this.querySelector('.placement-text').textContent;
+                    
+                    selectedText.textContent = text;
+                    hiddenInput.value = value;
+                    
+                    document.querySelectorAll('.dropdown-item').forEach(i => {
+                        i.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    toggle.classList.remove('active');
+                    menu.classList.remove('show');
+                });
+            });
+        }
+        
+        // Gerar opções de colocação
+        function generatePlacementOptions() {
+            let options = '';
+            
+            for (let i = 1; i <= 12; i++) {
+                const isOccupied = currentMatch.placementsUsed.includes(i);
+                const badgeClass = getPlacementBadgeClass(i);
+                
+                options += `
+                    <div class="dropdown-item ${isOccupied ? 'occupied' : ''}" data-value="${i}">
+                        <div class="placement-badge ${badgeClass}">${i}</div>
+                        <div class="placement-text">${i}º Lugar</div>
+                        ${isOccupied ? '<div class="placement-badge" style="background: var(--success); color: white; margin-left: auto;"><i class="fas fa-check"></i></div>' : ''}
+                    </div>
+                `;
+            }
+            
+            return options;
+        }
+        
+        // Classe do badge baseado na posição
+        function getPlacementBadgeClass(position) {
+            if (position === 1) return 'pos-1';
+            if (position === 2) return 'pos-2';
+            if (position === 3) return 'pos-3';
+            if (position >= 4 && position <= 6) return 'pos-4-6';
+            if (position >= 7 && position <= 9) return 'pos-7-9';
+            return 'pos-10-12';
+        }
+        
+        // Atualizar select de equipes
+        function updateTeamSelect() {
+            const select = document.getElementById('select-team');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Escolha uma equipe</option>';
+            
+            teams.forEach(team => {
+                if (currentMatch.isActive && currentMatch.teamsInMatch.some(t => t.id === team.id)) {
+                    return;
+                }
+                
+                const option = document.createElement('option');
+                option.value = team.id;
+                option.textContent = `${team.name} (${team.abbreviation})`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Atualizar display da partida atual
+        function updateCurrentMatchDisplay() {
+            const container = document.getElementById('current-match-teams-mobile');
+            if (!container) return;
+            
+            if (!currentMatch.isActive || currentMatch.teamsInMatch.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--gray);">
+                        <i class="fas fa-gamepad" style="font-size: 40px; opacity: 0.3; margin-bottom: 15px;"></i>
+                        <p>Nenhuma equipe registrada</p>
+                        <p style="font-size: 12px;">Adicione equipes à partida atual</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div style="display: grid; gap: 10px;">';
+            currentMatch.teamsInMatch.forEach(team => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; border: 1px solid var(--card-border);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                            <div>
+                                <div style="font-weight: 700; color: var(--primary);">${team.placement}º ${team.abbreviation}</div>
+                                <div style="font-size: 11px; color: var(--gray);">${team.name}</div>
+                            </div>
+                            <div style="color: var(--light); font-weight: 700; font-size: 18px;">${team.kills}</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--gray);">
+                            <span>Vitória: ${team.booyahs ? '✔️' : '❌'}</span>
+                            <span>Quedas: ${team.falls}</span>
+                            <span>Pontos: ${calculateTeamPoints(team)}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+        
+        // Calcular pontos da equipe
+        function calculateTeamPoints(teamData) {
+            const placementPts = scoreSettings.placementPoints[teamData.placement] || 0;
+            const killPts = teamData.kills * scoreSettings.killPoints;
+            const booyahPts = teamData.booyahs > 0 ? scoreSettings.booyahPoints : 0;
+            return placementPts + killPts + booyahPts;
+        }
+        
+        // Atualizar ranking
+        function updateRanking() {
+            const tbody = document.getElementById('ranking-body-mobile');
+            if (!tbody) return;
+            
+            const sortedTeams = [...teams].sort((a, b) => b.points - a.points);
+            
+            if (sortedTeams.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-trophy" style="font-size: 30px; opacity: 0.3; margin-bottom: 10px;"></i>
+                            <p>Nenhuma equipe no ranking</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            sortedTeams.forEach((team, index) => {
+                const posClass = index < 3 ? `pos-${index + 1}-mobile` : '';
+                
+                html += `
+                    <tr style="transition: var(--transition);">
+                        <td>
+                            <div class="position-badge-mobile ${posClass}">${index + 1}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 700; color: var(--light);">${team.abbreviation}</div>
+                            <div style="font-size: 11px; color: var(--gray);">${team.name}</div>
+                        </td>
+                        <td style="font-weight: 800; color: var(--primary); font-family: 'Orbitron';">${team.points}</td>
+                        <td style="color: var(--success); font-weight: 700;">${team.kills}</td>
+                        <td style="color: var(--warning); font-weight: 700;">${team.booyahs}</td>
+                        <td style="color: var(--danger); font-weight: 700;">${team.falls}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        // Atualizar histórico
+        function updateMatchHistory() {
+            const container = document.getElementById('match-history-mobile');
+            if (!container) return;
+            
+            if (matchHistory.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray);">
+                        <i class="fas fa-history" style="font-size: 40px; opacity: 0.3; margin-bottom: 15px;"></i>
+                        <p>Nenhuma partida registrada</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            matchHistory.forEach(match => {
+                const date = new Date(match.startTime).toLocaleDateString('pt-BR');
+                const time = new Date(match.startTime).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                
+                // Calcular top 3
+                const top3 = match.teamsInMatch
+                    .sort((a, b) => a.placement - b.placement)
+                    .slice(0, 3)
+                    .map(t => `${t.placement}º ${t.abbreviation}`)
+                    .join(', ');
+                
+                html += `
+                    <div class="history-item-mobile">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                            <div style="font-weight: 700; color: var(--primary); font-family: 'Orbitron';">PARTIDA #${match.id}</div>
+                            <div style="color: var(--gray); font-size: 11px;">${date} ${time}</div>
+                        </div>
+                        <div style="color: var(--light); font-size: 14px; margin-bottom: 8px;">
+                            ${match.teamsInMatch.length} equipes | Top 3: ${top3}
+                        </div>
+                        <div style="display: flex; gap: 10px; font-size: 11px; color: var(--gray);">
+                            <span>🔫 ${match.teamsInMatch.reduce((sum, t) => sum + t.kills, 0)} eliminações</span>
+                            <span>🏆 ${match.teamsInMatch.filter(t => t.booyahs).length} vitórias</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Atualizar UI das configurações
+        function updateSettingsUI() {
+            document.getElementById('kill-points').value = scoreSettings.killPoints;
+            document.getElementById('booyah-points').value = scoreSettings.booyahPoints;
+            document.getElementById('placement-preset').value = scoreSettings.placementPreset;
+        }
+        
+        // FUNÇÕES DE CONTROLE
+        
+        // Adicionar equipe
+        function addTeam() {
+            const name = document.getElementById('team-name').value.trim();
+            const abbr = document.getElementById('team-abbr').value.trim().toUpperCase();
+            
+            if (!name || !abbr || abbr.length < 2 || abbr.length > 4) {
+                showNotification('Preencha corretamente: Nome e Tag (2-4 letras)', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            const exists = teams.some(team => 
+                team.name.toLowerCase() === name.toLowerCase() || 
+                team.abbreviation === abbr
+            );
+            
+            if (exists) {
+                showNotification('Equipe já cadastrada!', 'error');
+                return;
+            }
+            
+            // Criar nova equipe
+            const newId = teams.length > 0 ? Math.max(...teams.map(t => t.id)) + 1 : 1;
+            const newTeam = {
+                id: newId,
+                name: name,
+                abbreviation: abbr,
+                points: 0,
+                kills: 0,
+                booyahs: 0,
+                falls: 0,
+                matches: 0
+            };
+            
+            teams.push(newTeam);
+            updateTeamsList();
+            updateStatusCards();
+            saveData();
+            
+            // Limpar formulário
+            document.getElementById('team-name').value = '';
+            document.getElementById('team-abbr').value = '';
+            
+            showNotification(`Equipe "${name}" adicionada!`, 'success');
+        }
+        
+        // Adicionar equipes de exemplo
+        function addExampleTeams() {
+            const exampleTeams = [
+                { id: 1, name: "Furia", abbreviation: "FUR", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 },
+                { id: 2, name: "Loud", abbreviation: "LLL", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 },
+                { id: 3, name: "Fluxo", abbreviation: "FLX", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 },
+                { id: 4, name: "INTZ", abbreviation: "ITZ", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 },
+                { id: 5, name: "Vivo Keyd", abbreviation: "VK", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 },
+                { id: 6, name: "LOS GRANDES", abbreviation: "LG", points: 0, kills: 0, booyahs: 0, falls: 0, matches: 0 }
+            ];
+            
+            // Adicionar apenas equipes que não existem
+            let added = 0;
+            exampleTeams.forEach(example => {
+                const exists = teams.some(team => team.abbreviation === example.abbreviation);
+                if (!exists) {
+                    teams.push(example);
+                    added++;
+                }
+            });
+            
+            updateTeamsList();
+            updateStatusCards();
+            saveData();
+            
+            showNotification(`${added} equipes de exemplo adicionadas!`, 'success');
+        }
+        
+        // Limpar equipes
+        function clearTeams() {
+            if (teams.length === 0) {
+                showNotification('Não há equipes para limpar!', 'warning');
+                return;
+            }
+            
+            if (confirm(`Remover TODAS as ${teams.length} equipes?\nEsta ação não pode ser desfeita.`)) {
+                teams = [];
+                updateTeamsList();
+                updateStatusCards();
+                saveData();
+                showNotification('Todas as equipes foram removidas!', 'success');
+            }
+        }
+        
+        // Iniciar nova partida
+        function startNewMatch() {
+            if (teams.length < 2) {
+                showNotification('É necessário pelo menos 2 equipes!', 'error');
+                return;
+            }
+            
+            const matchId = matchHistory.length > 0 ? Math.max(...matchHistory.map(m => m.id)) + 1 : 1;
+            
+            currentMatch = {
+                id: matchId,
+                teamsInMatch: [],
+                placementsUsed: [],
+                isActive: true,
+                startTime: new Date().toISOString()
+            };
+            
+            saveData();
+            switchTab('partida');
+            showNotification(`Partida #${matchId} iniciada!`, 'success');
+        }
+        
+        // Finalizar partida
+        function finishMatch() {
+            if (currentMatch.teamsInMatch.length === 0) {
+                showNotification('Nenhuma equipe na partida!', 'error');
+                return;
+            }
+            
+            if (confirm(`Finalizar partida #${currentMatch.id}?`)) {
+                // Calcular e atualizar pontos
+                currentMatch.teamsInMatch.forEach(teamData => {
+                    const team = teams.find(t => t.id === teamData.id);
+                    if (!team) return;
+                    
+                    const placementPts = scoreSettings.placementPoints[teamData.placement] || 0;
+                    const killPts = teamData.kills * scoreSettings.killPoints;
+                    const booyahPts = teamData.booyahs > 0 ? scoreSettings.booyahPoints : 0;
+                    const totalPoints = placementPts + killPts + booyahPts;
+                    
+                    team.points += totalPoints;
+                    team.kills += teamData.kills;
+                    team.booyahs += teamData.booyahs;
+                    team.falls += teamData.falls;
+                    team.matches += 1;
+                });
+                
+                // Adicionar ao histórico
+                const matchCopy = JSON.parse(JSON.stringify(currentMatch));
+                matchCopy.endTime = new Date().toISOString();
+                matchCopy.scoreSettings = {...scoreSettings};
+                matchHistory.unshift(matchCopy);
+                
+                // Resetar partida
+                currentMatch = {
+                    id: null,
+                    teamsInMatch: [],
+                    placementsUsed: [],
+                    isActive: false
+                };
+                
+                saveData();
+                switchTab('classificacao');
+                showNotification('Partida finalizada! Pontos calculados.', 'success');
+            }
+        }
+        
+        // Registrar equipe na partida
+        function registerTeamInMatch() {
+            const teamId = parseInt(document.getElementById('select-team').value);
+            const kills = parseInt(document.getElementById('kills').value);
+            const booyahs = parseInt(document.getElementById('booyahs').value);
+            const placement = parseInt(document.getElementById('placement').value);
+            
+            // Validações
+            if (!teamId || isNaN(kills) || !placement) {
+                showNotification('Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            if (currentMatch.placementsUsed.includes(placement)) {
+                showNotification('Colocação já utilizada!', 'error');
+                return;
+            }
+            
+            // Encontrar equipe
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            // Adicionar à partida
+            const teamData = {
+                id: teamId,
+                name: team.name,
+                abbreviation: team.abbreviation,
+                kills: kills,
+                booyahs: booyahs,
+                placement: placement,
+                falls: currentFalls
+            };
+            
+            currentMatch.teamsInMatch.push(teamData);
+            currentMatch.placementsUsed.push(placement);
+            
+            // Atualizar interface
+            updateCurrentMatchDisplay();
+            saveData();
+            
+            showNotification(`${team.abbreviation} registrada na partida!`, 'success');
+            
+            // Limpar formulário
+            document.getElementById('select-team').value = '';
+            document.getElementById('kills').value = '0';
+            document.getElementById('booyahs').value = '0';
+            document.getElementById('placement').value = '';
+            currentFalls = 0;
+            document.getElementById('falls-count-mobile').textContent = '0';
+            document.getElementById('falls-slider').value = '0';
+            
+            // Resetar dropdown
+            const selectedText = document.getElementById('dropdown-selected-text');
+            if (selectedText) selectedText.textContent = 'Selecione a colocação';
+            
+            updateTeamSelect();
+            initializePlacementDropdown();
+        }
+        
+        // Salvar configurações
+        function saveSettings() {
+            scoreSettings.killPoints = parseFloat(document.getElementById('kill-points').value);
+            scoreSettings.booyahPoints = parseFloat(document.getElementById('booyah-points').value);
+            scoreSettings.placementPreset = document.getElementById('placement-preset').value;
+            
+            // Atualizar sistema de colocação baseado no preset
+            if (scoreSettings.placementPreset === 'lbff') {
+                scoreSettings.placementPoints = {
+                    1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 
+                    6: 5, 7: 4, 8: 3, 9: 2, 
+                    10: 1, 11: 1, 12: 1
+                };
+            } else if (scoreSettings.placementPreset === 'simple') {
+                scoreSettings.placementPoints = {
+                    1: 10, 2: 8, 3: 6, 4: 5, 5: 4, 
+                    6: 3, 7: 2, 8: 1, 9: 0, 
+                    10: 0, 11: 0, 12: 0
+                };
+            }
+            
+            localStorage.setItem('lsScoreSettings', JSON.stringify(scoreSettings));
+            showNotification('Configurações salvas!', 'success');
+        }
+        
+        // Exportar JSON
+        function exportJSON() {
+            const data = {
+                teams: teams,
+                matchHistory: matchHistory,
+                currentMatch: currentMatch,
+                scoreSettings: scoreSettings,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `last_stand_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            
+            showNotification('JSON exportado!', 'success');
+        }
+        
+        // Exportar CSV
+        function exportCSV() {
+            if (teams.length === 0) {
+                showNotification('Não há dados para exportar!', 'warning');
+                return;
+            }
+            
+            let csv = 'Equipe,Tag,Pontos,Eliminações,Vitórias,Quedas,Partidas\n';
+            teams.forEach(team => {
+                csv += `"${team.name}","${team.abbreviation}",${team.points},${team.kills},${team.booyahs},${team.falls},${team.matches}\n`;
+            });
+            
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ranking_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            
+            showNotification('CSV exportado!', 'success');
+        }
+        
+        // Limpar histórico
+        function clearHistory() {
+            if (matchHistory.length === 0) {
+                showNotification('Histórico já está vazio!', 'warning');
+                return;
+            }
+            
+            if (confirm('Limpar todo o histórico de partidas?')) {
+                matchHistory = [];
+                saveData();
+                switchTab('historico');
+                showNotification('Histórico limpo!', 'success');
+            }
+        }
+        
+        // Reiniciar sistema
+        function resetChampionship() {
+            if (confirm('REINICIAR TODO O SISTEMA?\n\nTODOS os dados serão PERDIDOS permanentemente!')) {
+                // Limpar todos os dados
+                teams = [];
+                matchHistory = [];
+                currentMatch = {
+                    id: null,
+                    teamsInMatch: [],
+                    placementsUsed: [],
+                    isActive: false
+                };
+                
+                // Limpar localStorage
+                localStorage.removeItem('lsTeams');
+                localStorage.removeItem('lsMatchHistory');
+                localStorage.removeItem('lsCurrentMatch');
+                localStorage.removeItem('lsScoreSettings');
+                
+                // Atualizar interface
+                updateStatusCards();
+                switchTab('equipes');
+                
+                showNotification('Sistema reiniciado com sucesso!', 'success');
+            }
+        }
+        
+        // Salvar dados
+        function saveData() {
+            localStorage.setItem('lsTeams', JSON.stringify(teams));
+            localStorage.setItem('lsMatchHistory', JSON.stringify(matchHistory));
+            localStorage.setItem('lsCurrentMatch', JSON.stringify(currentMatch));
+        }
+        
+        // Mostrar notificação
+        function showNotification(message, type) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification-mobile notification-${type}-mobile`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            notification.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Remover após 4 segundos
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+        
+        // Funções globais para edição/exclusão
+        window.editTeamPrompt = function(id) {
+            const team = teams.find(t => t.id === id);
+            if (!team) return;
+            
+            const newName = prompt('Novo nome da equipe:', team.name);
+            if (!newName || newName.trim() === '') return;
+            
+            const newAbbr = prompt('Nova tag (2-4 letras):', team.abbreviation);
+            if (!newAbbr || newAbbr.length < 2 || newAbbr.length > 4) return;
+            
+            // Verificar se já existe
+            const nameExists = teams.some(t => 
+                t.id !== id && t.name.toLowerCase() === newName.toLowerCase()
+            );
+            
+            const abbrExists = teams.some(t => 
+                t.id !== id && t.abbreviation === newAbbr.toUpperCase()
+            );
+            
+            if (nameExists || abbrExists) {
+                showNotification('Já existe uma equipe com este nome ou tag!', 'error');
+                return;
+            }
+            
+            team.name = newName.trim();
+            team.abbreviation = newAbbr.toUpperCase();
+            
+            saveData();
+            switchTab('equipes');
+            
+            showNotification('Equipe atualizada!', 'success');
+        };
+        
+        window.deleteTeam = function(id) {
+            const team = teams.find(t => t.id === id);
+            if (!team) return;
+            
+            if (confirm(`Remover a equipe ${team.name} (${team.abbreviation})?`)) {
+                teams = teams.filter(t => t.id !== id);
+                saveData();
+                switchTab('equipes');
+                showNotification('Equipe removida!', 'success');
+            }
+        };
+    </script>
+</body>
+</html>
